@@ -1,5 +1,5 @@
 cmake_minimum_required( VERSION "2.8.0" )
-set( MAIN_EXECUTABLE my_exe )
+set( MAIN_EXECUTABLE jetweb )
 
 project( ${MAIN_EXECUTABLE} CXX C )
 
