@@ -19,6 +19,6 @@ target_link_libraries( ${MAIN_EXECUTABLE} ${LIBS} )
 
 if( CMAKE_COMPILER_IS_GNUCXX )
     message( STATUS "GCC detected, adding compile flags" )
-    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -O3 -std=gnu++0x -g" )
+    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -O3 -std=gnu++0x" )
 endif( CMAKE_COMPILER_IS_GNUCXX )
 

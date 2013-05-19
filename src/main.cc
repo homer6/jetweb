@@ -218,8 +218,8 @@ main (int argc, char *argv[])
                                    NI_NUMERICHOST | NI_NUMERICSERV);
                   if (s == 0)
                     {
-                      printf("Accepted connection on descriptor %d "
-                             "(host=%s, port=%s)\n", infd, hbuf, sbuf);
+//                      printf("Accepted connection on descriptor %d "
+  //                           "(host=%s, port=%s)\n", infd, hbuf, sbuf);
                     }
 
                   /* Make the incoming socket non-blocking and add it to the
@@ -296,15 +296,15 @@ main (int argc, char *argv[])
                   }
 
                   //close( events[i].data.fd );
-                  done = 1;
-                  break;
+//                  done = 1;
+//                  break;
 
                 }
 
               if (done)
                 {
-                  printf ("Closed connection on descriptor %d\n",
-                          events[i].data.fd);
+    //              printf ("Closed connection on descriptor %d\n",
+    //                      events[i].data.fd);
 
                   /* Closing the descriptor will make epoll remove it
                      from the set of descriptors which are monitored. */
