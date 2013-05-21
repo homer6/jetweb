@@ -1,4 +1,7 @@
 
+
+#include "jet/File.h"
+#include "jet/Exception.h"
 #include "jet/Utf8String.h"
 
 using namespace jet;
@@ -7,10 +10,6 @@ using namespace jet;
 /*
 #include <iostream>
 #include <bitset>
-
-
-#include "jet/File.h"
-#include "jet/Exception.h"
 
 
 using namespace std;
@@ -57,28 +56,29 @@ void red( Utf8String text ){
 
 #define MAXEVENTS 40000
 
-int
-make_socket_non_blocking (int sfd)
-{
-  int flags, s;
 
-  flags = fcntl( sfd, F_GETFL, 0 );
-  if (flags == -1)
-    {
-      perror ("fcntl");
-      return -1;
+
+int make_socket_non_blocking( int sfd ){
+
+    int flags, s;
+
+    flags = fcntl( sfd, F_GETFL, 0 );
+    if( flags == -1 ){
+        perror ("fcntl");
+        return -1;
     }
 
-  flags |= O_NONBLOCK;
-  s = fcntl (sfd, F_SETFL, flags);
-  if (s == -1)
-    {
-      perror ("fcntl");
-      return -1;
+    flags |= O_NONBLOCK;
+    s = fcntl( sfd, F_SETFL, flags );
+    if( s == -1 ){
+        perror ("fcntl");
+        return -1;
     }
 
-  return 0;
+    return 0;
+
 }
+
 
 
 int flush( int socket ){
@@ -92,6 +92,8 @@ int flush( int socket ){
 
 }
 
+
+
 int cork( int socket ){
 
     int state = 1;
@@ -99,6 +101,7 @@ int cork( int socket ){
     return 0;
 
 }
+
 
 
 int write_flush( int connection_socket_fd, const Utf8String &response_message ){
@@ -113,6 +116,20 @@ int write_flush( int connection_socket_fd, const Utf8String &response_message ){
     return 0;
 
 }
+
+
+int write_noflush( int connection_socket_fd, const Utf8String &response_message ){
+
+    int s = write( connection_socket_fd, response_message.getCString(), response_message.getLength() );
+    if( s == -1 ){
+        perror( "write to connection error" );
+        abort();
+    }
+
+    return 0;
+
+}
+
 
 
 
@@ -173,6 +190,21 @@ int create_and_bind( char *port ){
 }
 
 
+int send_response( int connection_socket_fd, const Utf8String &response_body ){
+
+    Utf8String response_headers(
+        "HTTP/1.1 200 OK\n"
+        "Content-Encoding: gzip\n"
+        "Content-Length: " + Utf8String( response_body.getLength() ) + "\n\n"
+    );
+    write_noflush( connection_socket_fd, response_headers );
+
+    write_flush( connection_socket_fd, response_body );
+
+    return 0;
+
+}
+
 
 
 int main( int argc, char *argv[] ){
@@ -220,28 +252,21 @@ int main( int argc, char *argv[] ){
         abort();
     }
 
-    Utf8String response_body(
-        "hello"
-    );
+    File response_file( "responses/001.html.gz" );
 
-    Utf8String response_headers(
-        "HTTP/1.1 200 OK\n"
-        "Content-Length: " + Utf8String( response_body.getLength() ) + "\n\n"
-    );
-
-    Utf8String response_message( response_headers + response_body );
-
+    Utf8String response_body = response_file.getContents();
 
 
     /* Buffer where events are returned */
     events = (struct epoll_event *) calloc( MAXEVENTS, sizeof event );
 
     /* The event loop */
-    while (1){
+    while( 1 ){
 
         int n, i;
 
         n = epoll_wait( efd, events, MAXEVENTS, -1 );
+
         for( i = 0; i < n; i++ ){
 
             if(
@@ -368,8 +393,7 @@ int main( int argc, char *argv[] ){
                     abort ();
                     }*/
 
-
-                    write_flush( connection_socket_fd, response_message );
+                    send_response( connection_socket_fd, response_body );
 
                     number_of_requests++;
 
