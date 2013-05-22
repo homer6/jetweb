@@ -25,8 +25,9 @@ Download and Install
 
     sudo ln -s `pwd`/build/my_exe /usr/bin/my_exe
 
-
-
+    sudo su
+    ulimit -Hn 40000
+    ulimit -Sn 40000
 
 Running
 -------
